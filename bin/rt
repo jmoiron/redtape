@@ -1,0 +1,15 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""redtape command line binary"""
+
+import sys
+from redtape import script
+
+if __name__ == '__main__':
+    try:
+        sys.exit(script.main() or 0)
+    except KeyboardInterrupt:
+        pass
+
+
