@@ -29,9 +29,12 @@ parser = OptionParser(version=".".join(map(str, redtape.VERSION)),
         usage="%prog [opts] <file(s)>")
 parser.add_option("-t", "--template", help="use alternate document template")
 parser.add_option("-e", "--embed", action="store_true", help="embed all css/js in each output file")
-parser.add_option("", "--pygments", action="store_true", help="use pygments for code blocks")
+parser.add_option("-d", "--destination", help="write HTML/assets to a separate destination directory")
+parser.add_option("", "--create-assets", action="store_true", help="create/update directory ./assets with rt assets")
+parser.add_option("", "--pygments", action="store_true", help="use pygments for code blocks instead of hilite")
 parser.add_option("", "--pygments-class", help="use alternate pygments class (implies --pygments)")
 
+pkg_dir = os.path.dirname(__file__)
 asset_path = os.path.join(os.path.dirname(__file__), "assets")
 
 def extract_title(fragment):
@@ -68,7 +71,8 @@ def main():
         parser.print_usage()
         return -1
 
-    use_prettify = not opts.pygments
+    context = {}
+    use_prettify = context['prettify'] = not opts.pygments
 
     css = [
         "assets/css/bootstrap.min.css",
@@ -76,9 +80,24 @@ def main():
     ]
     js = [
         "assets/js/jquery.min.js",
-        "assets/js/prettify.js",
         "assets/js/bootstrap.min.js",
     ]
+    if use_prettify:
+        js.append("assets/js/prettify.js")
+
+    context['js'] = js
+    context['css'] = css
+
+    if opts.embed:
+        embed = {'css':[], 'js':[]}
+        for csf in css:
+            with open(os.path.join(pkg_dir, csf)) as f:
+                embed['css'].append(f.read().decode("utf-8"))
+        for jsf in js:
+            with open(os.path.join(pkg_dir, jsf)) as f:
+                embed['js'].append(f.read().decode("utf-8"))
+        context['embed'] = embed
+
 
     paths = args_to_paths(args)
     for path in paths:
@@ -86,4 +105,8 @@ def main():
         with open(path) as f:
             document = gfm.gfmd(f.read())
         title = extract_title(document)
-        print document
+        context['title'] = title
+        context['document'] = document
+        env = jinja2.Environment(loader=jinja2.PackageLoader('redtape', 'assets'))
+        template = env.get_template("basic.jinja")
+        print template.render(context).encode("utf-8")

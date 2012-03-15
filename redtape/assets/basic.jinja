@@ -23,7 +23,7 @@
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
   </head>
-  <body>
+  <body {% if prettify %}onload="prettyPrint();"{% endif %}>
   <div class="container">
 {{ document }}
   </div>
