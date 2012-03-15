@@ -32,6 +32,8 @@ setup(
     include_package_data=True,
     zip_safe=False,
     test_suite="tests",
+    scripts=['bin/rt'],
+    package_data={'redtape': ['assets/*']},
     install_requires=[
         "markdown",
         "pygments",

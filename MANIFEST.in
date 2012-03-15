@@ -1,2 +1,7 @@
 include README.rst
 include LICENCE
+include redtape/assets/basic.jinja
+include redtape/assets/js/*.js
+include redtape/assets/css/*.css
+include redtape/assets/img/*
+
