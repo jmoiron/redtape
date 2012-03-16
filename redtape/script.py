@@ -30,6 +30,7 @@ parser = OptionParser(version=".".join(map(str, redtape.VERSION)),
 parser.add_option("-t", "--template", help="use alternate document template")
 parser.add_option("-e", "--embed", action="store_true", help="embed all css/js in each output file")
 parser.add_option("-d", "--destination", help="write HTML/assets to a separate destination directory")
+parser.add_option("", "--use-js", action="store_true", help="link in jquery & bootstrap js files")
 parser.add_option("", "--create-assets", action="store_true", help="create/update directory ./assets with rt assets")
 parser.add_option("", "--pygments", action="store_true", help="use pygments for code blocks instead of hilite")
 parser.add_option("", "--pygments-class", help="use alternate pygments class (implies --pygments)")
@@ -65,11 +66,21 @@ def args_to_paths(args):
             paths += markdown_files(arg)
     return paths
 
+def create_assets():
+    current = os.curdir()
+    destination = os.path.join(current, "assets")
+    if os.path.exists(destination) and not os.path.isdir(destination):
+        raise Exception("The path ./assets exists and is a file.")
+
 def main():
     opts, args = parser.parse_args()
     if not args:
         parser.print_usage()
         return -1
+
+    if opts.create_assets:
+        create_assets()
+        return 0
 
     context = {}
     use_prettify = context['prettify'] = not opts.pygments
@@ -78,11 +89,12 @@ def main():
         "assets/css/bootstrap.min.css",
         "assets/css/%s" % ("prettify.css" if use_prettify else "pygments.css"),
     ]
-    js = [
+    js = [] if not opts.use_js else [
         "assets/js/jquery.min.js",
         "assets/js/bootstrap.min.js",
     ]
-    if use_prettify:
+
+    if use_prettify: # if prettifying, link prettify no matter what
         js.append("assets/js/prettify.js")
 
     context['js'] = js
@@ -103,7 +115,7 @@ def main():
     for path in paths:
         output = path.rsplit('.', 1)[0] + '.html'
         with open(path) as f:
-            document = gfm.gfmd(f.read())
+            document = gfm.gfmd(f.read(), fenced="pygments" if opts.pygments else "bootstrap")
         title = extract_title(document)
         context['title'] = title
         context['document'] = document

@@ -28,11 +28,7 @@ if __name__ == '__main__':
 
 We can highlight it in a number of ways.
 
-<span style="display: block;" class="alert alert-info">We can even include HTML markup, since markdown allows it!  This has the added
-benefit of working quite well and being pretty awesome.  As you can see, we can
-use all of twitter bootstrap's classes in here. Fortunately, [links](http://twitter.com) work 
-inside spans, so use spans with `style="display: block;"` to have markdown 
-syntax inside block elements.
+<span style="display: block;" class="alert alert-info">We can even include HTML markup, since markdown allows it!  This has the added benefit of working quite well and being pretty awesome.  As you can see, we can use all of twitter bootstrap's classes in here. Fortunately, [links](http://twitter.com) work  inside spans, so use spans with `style="display: block;"` to have markdown syntax inside block elements.
 </span>
 
 Unfortunately, while we're inside other markup, simple markdown stuff like [a link](http://google.com) won't function.  Would be nice if it did though.

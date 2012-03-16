@@ -76,7 +76,7 @@ def fenced_pygments(block):
     lang = gd.get('lang', None)
     code = gd.get('code', '').lstrip()
     cls = ('code %s' % lang) if lang else 'code'
-    formatter = HtmlFormatter(cssclass=cls)
+    formatter = HtmlFormatter(linenos=True, cssclass=cls)
     lexer = get_lexer(lang, code)
     return highlight(code, lexer, formatter)
 

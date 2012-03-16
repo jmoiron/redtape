@@ -11,5 +11,8 @@ if __name__ == '__main__':
         sys.exit(script.main() or 0)
     except KeyboardInterrupt:
         pass
+    except Exception, e:
+        sys.stderr.write("Error: %s" % e.message)
+    sys.exit(-2)
 
 

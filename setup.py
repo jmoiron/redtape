@@ -22,6 +22,9 @@ setup(
     # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
         'Development Status :: 1 - Planning',
+        'Operating System :: POSIX',
+        'Environment :: Console',
+        'License :: OSI Approved :: MIT License',
     ],
     keywords='github markdown documentation quick small simple',
     author='Jason Moiron',
