@@ -48,3 +48,47 @@ You can run a simple HTTP server and look at them, fully styled::
 
     > python -m SimpleHTTPServer
 
+customizing output
+------------------
+
+Customizing output is easy to do in a variety of ways.  Besides changing the
+asset CSS for non-embedded documents, you can also add headers and footers or
+even use custom document templates based on redtape's default template.
+
+headers and footers
+~~~~~~~~~~~~~~~~~~~
+
+If you have a customized document header or footer you want added to your
+documents, you can either add ``header.html`` and ``footer.html`` documents
+to the base directory you are rendering or set default paths to be used 
+in the config as ``header`` and ``footer``.  By default, these will be
+placed at the top and bottom of your document, respectively.
+
+A sample set of documents could be::
+
+    > ls mydocs/
+    mydocs/index.md       mydocs/simple.md      mydocs/advanced.md
+    mydocs/header.html    mydocs/footer.html
+
+Rendering mydocs with ``rt mydocs`` will use the header and footer for each
+document in the directory.
+
+custom templates
+~~~~~~~~~~~~~~~~
+
+If you have very specific requirements, you can write your own document
+template and have total control of the output.  Redtape uses the `jinja2`_
+templating engine, which is a widely used templating system similar to
+django templates.  Run redtape with the ``--context`` argument to get a brief
+idea of what variables are available to the template.
+
+You can also inherit from ``basic.jinja``, which is the name of redtape's
+default template.  This template defines two blocks, ``head`` and ``body``,
+which would allow you to craft a distinct document body while, for instance,
+retaining the basic CSS and JavaScript functionality of redtape.  Overriding
+both will leave you with a standard HTML5 document structure.
+
+You can specify a custom template to use with ``-t, --template`` or place
+it in the document directory as ``custom.html`` or ``custom.jinja``.
+
+.. _jinja2: http://jinja.pocoo.org/docs/

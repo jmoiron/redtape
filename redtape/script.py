@@ -13,7 +13,7 @@ retaining control over document style."""
 import pygments
 import jinja2
 try:
-    from lxml.html import fragment_fromstring
+    from lxml.html import document_fromstring
     from lxml.cssselect import CSSSelector as cs
     has_lxml = True
 except:
@@ -33,16 +33,15 @@ parser.add_option("-d", "--destination", help="write HTML/assets to a separate d
 parser.add_option("", "--use-js", action="store_true", help="link in jquery & bootstrap js files")
 parser.add_option("", "--create-assets", action="store_true", help="create/update directory ./assets with rt assets")
 parser.add_option("", "--pygments", action="store_true", help="use pygments for code blocks instead of hilite")
-parser.add_option("", "--pygments-class", help="use alternate pygments class (implies --pygments)")
 
 pkg_dir = os.path.dirname(__file__)
 asset_path = os.path.join(os.path.dirname(__file__), "assets")
 
 def extract_title(fragment):
     if not has_lxml: return ""
-    doc = fragment_fromstring(fragment)
+    doc = document_fromstring(fragment)
     try:
-        return cs('h1')(doc).text_content
+        return cs('h1')(doc)[0].text_content()
     except:
         import traceback
         traceback.print_exc()
@@ -72,6 +71,10 @@ def create_assets():
     if os.path.exists(destination) and not os.path.isdir(destination):
         raise Exception("The path ./assets exists and is a file.")
 
+def get_jinja_template(opts, paths):
+    """Get a jinja template suitable for rendering our documents."""
+    
+
 def main():
     opts, args = parser.parse_args()
     if not args:
@@ -81,6 +84,7 @@ def main():
     if opts.create_assets:
         create_assets()
         return 0
+
 
     context = {}
     use_prettify = context['prettify'] = not opts.pygments
@@ -116,9 +120,9 @@ def main():
         output = path.rsplit('.', 1)[0] + '.html'
         with open(path) as f:
             document = gfm.gfmd(f.read(), fenced="pygments" if opts.pygments else "bootstrap")
-        title = extract_title(document)
-        context['title'] = title
+        context['title'] = extract_title(document)
         context['document'] = document
         env = jinja2.Environment(loader=jinja2.PackageLoader('redtape', 'assets'))
         template = env.get_template("basic.jinja")
         print template.render(context).encode("utf-8")
+

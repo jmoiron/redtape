@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
+    {{ meta }}
 
     <title>{{ title }}</title>
 
@@ -43,6 +44,12 @@
         background-color: #F7F7F9;
       }
     </style>
+    {# javascript #}
+    {% if embed %}{% for script in embed['js'] -%}
+        <script>{{ script }}</script>
+    {%- endfor %}{% else %}{% for script in js -%}
+    <script src="{{ script }}"></script>
+    {%- endfor %}{% endif %}
     {% endif %}
     
   {% endblock %}
@@ -53,19 +60,16 @@
   </head>
   {% block body %}
   <body {% if prettify %}onload="prettyPrint();"{% endif %}>
+  {{ header }}
   <div class="container">
 {{ document }}
   </div>
 
-  {% if embed %}{% for script in embed['js'] -%}
-      <script>{{ script }}</script>
-  {%- endfor %}{% else %}{% for script in js -%}
-  <script src="{{ script }}"></script>
-  {%- endfor %}{% endif %}
   {% if (embed['js'] or js) and not prettify %}
   {# add linenumbers to pygmentized source when javascript is available #}
   <script>$("div.linenodiv pre").each(function() { $(this).html($(this).html().replace(/\n/g, '.\n') + '.'); });</script>
   {% endif %}
+  {{ footer }}
   </body>
   {% endblock %}
 </html>
