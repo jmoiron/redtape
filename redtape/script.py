@@ -71,9 +71,31 @@ def create_assets():
     if os.path.exists(destination) and not os.path.isdir(destination):
         raise Exception("The path ./assets exists and is a file.")
 
-def get_jinja_template(opts, paths):
-    """Get a jinja template suitable for rendering our documents."""
-    
+def find_custom_template(args):
+    """Finds a custom template in the directories provided as arguments.  The
+    first template found is returned and used for the remainder of the docs."""
+    for arg in args:
+        if os.path.isdir(arg):
+            dirlist = os.listdir(arg)
+            if "custom.html" in dirlist:
+                return os.path.join(arg, "custom.html")
+            elif "custom.jinja" in dirlist:
+                return os.path.join(arg, "custom.jinja")
+
+def get_jinja_template(opts, args):
+    """Get a jinja template suitable for rendering our documents.  Care is
+    taken to chose figure out which template to render, and to allow custom
+    templates to inherit from the default one."""
+    template_paths = [asset_path]
+    template = "basic.jinja"
+    if opts.template:
+        extra, template = os.path.split(os.path.abspath(opts.template))
+        template_paths.append(extra)
+    else:
+        template = find_custom_template(args) or template
+
+    env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_paths))
+    return env.get_template(template)
 
 def main():
     opts, args = parser.parse_args()
@@ -122,7 +144,6 @@ def main():
             document = gfm.gfmd(f.read(), fenced="pygments" if opts.pygments else "bootstrap")
         context['title'] = extract_title(document)
         context['document'] = document
-        env = jinja2.Environment(loader=jinja2.PackageLoader('redtape', 'assets'))
-        template = env.get_template("basic.jinja")
+        template = get_jinja_template(opts, args)
         print template.render(context).encode("utf-8")
 
