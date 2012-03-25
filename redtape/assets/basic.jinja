@@ -44,13 +44,13 @@
         background-color: #F7F7F9;
       }
     </style>
+    {% endif %}
     {# javascript #}
     {% if embed %}{% for script in embed['js'] -%}
         <script>{{ script }}</script>
     {%- endfor %}{% else %}{% for script in js -%}
     <script src="{{ script }}"></script>
     {%- endfor %}{% endif %}
-    {% endif %}
     
   {% endblock %}
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
@@ -58,11 +58,13 @@
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
   </head>
-  {% block body %}
+  {% block outerbody %}
   <body {% if prettify %}onload="prettyPrint();"{% endif %}>
   {{ header }}
   <div class="container">
+  {% block body %}
 {{ document }}
+  {% endblock %}
   </div>
 
   {% if (embed['js'] or js) and not prettify %}

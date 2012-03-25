@@ -29,10 +29,10 @@ parser = OptionParser(version=".".join(map(str, redtape.VERSION)),
         usage="%prog [opts] <file(s)>")
 parser.add_option("-t", "--template", help="use alternate document template")
 parser.add_option("-e", "--embed", action="store_true", help="embed all css/js in each output file")
-parser.add_option("-d", "--destination", help="write HTML/assets to a separate destination directory")
+parser.add_option("-o", "--destination", help="write HTML/assets to a separate destination directory")
 parser.add_option("", "--use-js", action="store_true", help="link in jquery & bootstrap js files")
 parser.add_option("", "--create-assets", action="store_true", help="create/update directory ./assets with rt assets")
-parser.add_option("", "--pygments", action="store_true", help="use pygments for code blocks instead of hilite")
+parser.add_option("", "--prettify", action="store_true", help="use google prettify for code blocks instead of pygments")
 
 pkg_dir = os.path.dirname(__file__)
 asset_path = os.path.join(os.path.dirname(__file__), "assets")
@@ -46,7 +46,6 @@ def extract_title(fragment):
         import traceback
         traceback.print_exc()
         return ""
-
 
 def markdown_files(directory):
     paths = []
@@ -66,10 +65,13 @@ def args_to_paths(args):
     return paths
 
 def create_assets():
-    current = os.curdir()
+    import shutil
+    current = os.path.abspath(os.curdir)
     destination = os.path.join(current, "assets")
     if os.path.exists(destination) and not os.path.isdir(destination):
         raise Exception("The path ./assets exists and is a file.")
+    shutil.copytree(asset_path, destination)
+
 
 def find_custom_template(args):
     """Finds a custom template in the directories provided as arguments.  The
@@ -99,17 +101,18 @@ def get_jinja_template(opts, args):
 
 def main():
     opts, args = parser.parse_args()
-    if not args:
-        parser.print_usage()
-        return -1
 
     if opts.create_assets:
         create_assets()
         return 0
 
+    if not args:
+        parser.print_usage()
+        return -1
+
 
     context = {}
-    use_prettify = context['prettify'] = not opts.pygments
+    use_prettify = context['prettify'] = opts.prettify
 
     css = [
         "assets/css/bootstrap.min.css",
@@ -135,13 +138,14 @@ def main():
             with open(os.path.join(pkg_dir, jsf)) as f:
                 embed['js'].append(f.read().decode("utf-8"))
         context['embed'] = embed
-
+    else:
+        context['embed'] = None
 
     paths = args_to_paths(args)
     for path in paths:
         output = path.rsplit('.', 1)[0] + '.html'
         with open(path) as f:
-            document = gfm.gfmd(f.read(), fenced="pygments" if opts.pygments else "bootstrap")
+            document = gfm.gfmd(f.read(), fenced="pygments" if not opts.prettify else "bootstrap")
         context['title'] = extract_title(document)
         context['document'] = document
         template = get_jinja_template(opts, args)

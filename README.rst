@@ -1,7 +1,7 @@
 redtape
 -------
 
-``redtape`` is a focused documentation generator that uses `github flavored markdown`_
+``redtape`` is a focused *document* generator that uses `github flavored markdown`_
 to generate simple, attractive HTML documents.  It automatically integrates with
 `twitter bootstrap`_ and features simple, attractive styling.  It is inspired by
 `d`_, but attempts to have a simple interface while still allowing users to style
@@ -18,35 +18,55 @@ If you are on linux or OSX, you can use `pip`_ to install::
 
     > pip install redtape
 
-Which will install redtape and its dependencies.
+Which will install redtape and its dependencies.  
 
 .. _pip: http://www.pip-installer.org/en/latest/index.html
 
 usage
 -----
 
-To use, run ``rt`` on a document or directory full of documents.  It will
-create html files for every markdown file (``.md``, ``.mdown``, or 
-``.markdown`` extensions)::
+To use, run ``rt`` on a document or directory full of documents.  If run on
+a directory, ``rt`` will create html files for every markdown file (``.md``,
+``.mdown``, or ``.markdown`` extensions)::
 
     > rt mydocument.md
     > rt documentation/
 
+assets
+------
+
 By default, ``rt`` assumes you have set up a location to serve the files from
-which have the assets that ``rt`` links into these documents.  If you can't be
-bothered to do that, you have two options.  You can embed all of the assets
-used in the resultant document::
-
-    > rt --embed mydocument.md
-
-You can ask ``rt`` to put a copy of its assets in a directory called
-``./assets``::
+which have the assets that ``rt`` links into these documents.  The layout is
+exactly the same as the `assets directory`_ in the redtape repository:
+``/assets/{css,img,js}/..`` for each asset that you will be using.  If you want
+to use redtape's default assets, you can easily create a suitable asset
+directory in the current directory by running::
 
     > rt --create-assets
 
-You can run a simple HTTP server and look at them, fully styled::
+If you are running in single document mode or do not wish to set up an asset
+directory on the eventual host for your HTML documents, you can tell redtape to
+embed each asset used in a document by using ``--embed``::
 
-    > python -m SimpleHTTPServer
+    > rt --embed mydocument.md
+
+.. _assets directory: https://github.com/jmoiron/redtape/blob/master/redtape/script.py
+
+javascript
+~~~~~~~~~~
+
+By default, ``redtape`` not require any javascript to run, and will not embed
+any in ``--embed`` mode.  If the ``--prettify`` option is selected, google's
+prettify library will be used for source highlighting instead of `pygments`_,
+and if ``--prettify`` and ``--embed`` are both used, it will be automatically
+embedded.
+
+Redtape is also suitable for simple single-page javascript demonstrations, and
+if ``--use-js`` is enabled, redtape will include `jquery`_ and bootstrap's
+javascript libraries.
+
+.. _pygments: http://pygments.org
+.. _jquery: http://jquery.org
 
 customizing output
 ------------------
