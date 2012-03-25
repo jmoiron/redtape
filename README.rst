@@ -112,3 +112,9 @@ You can specify a custom template to use with ``-t, --template`` or place
 it in the document directory as ``custom.html`` or ``custom.jinja``.
 
 .. _jinja2: http://jinja.pocoo.org/docs/
+
+sample output
+-------------
+
+.. image:: http://jmoiron.net/~jmoiron/i/sldriiq.png
+
