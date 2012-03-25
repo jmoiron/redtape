@@ -149,5 +149,7 @@ def main():
         context['title'] = extract_title(document)
         context['document'] = document
         template = get_jinja_template(opts, args)
-        print template.render(context).encode("utf-8")
+        with open(output, "w") as f:
+            f.write(template.render(context).encode("utf-8"))
+            print "Created %s from %s" % (output, path)
 
