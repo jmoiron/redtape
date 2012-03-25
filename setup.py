@@ -22,7 +22,7 @@ setup(
     long_description=open('README.rst').read(),
     # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
-        'Development Status :: 1 - Planning',
+        'Development Status :: 5 - Production/Stable',
         'Operating System :: POSIX',
         'Environment :: Console',
         'License :: OSI Approved :: MIT License',
@@ -37,7 +37,7 @@ setup(
     zip_safe=False,
     test_suite="tests",
     scripts=['bin/rt'],
-    package_data={'redtape': ['assets/*']},
+    #package_data={'redtape': ['assets/*']},
     install_requires=[
         "markdown",
         "pygments",
