@@ -30,6 +30,7 @@ parser = OptionParser(version=".".join(map(str, redtape.VERSION)),
 parser.add_option("-t", "--template", help="use alternate document template")
 parser.add_option("-e", "--embed", action="store_true", help="embed all css/js in each output file")
 parser.add_option("-o", "--destination", help="write HTML/assets to a separate destination directory")
+parser.add_option("-r", "--recursive", action="store_true", help="recurse into subdirectories")
 parser.add_option("", "--use-js", action="store_true", help="link in jquery & bootstrap js files")
 parser.add_option("", "--create-assets", action="store_true", help="create/update directory ./assets with rt assets")
 parser.add_option("", "--prettify", action="store_true", help="use google prettify for code blocks instead of pygments")
@@ -53,14 +54,17 @@ def markdown_files(directory):
         paths += glob(os.path.join(directory, "*%s" % ext))
     return paths
 
-def args_to_paths(args):
+def arg_to_paths(arg, recursive=False):
     paths = []
-    for arg in args:
-        if not os.path.exists(arg):
-            raise Exception("File not found: %s" % arg)
-        if os.path.isfile(arg):
-            paths.append(arg)
-        if os.path.isdir(arg):
+    if not os.path.exists(arg):
+        raise Exception("File not found: %s" % arg)
+    if os.path.isfile(arg):
+        paths.append(arg)
+    if os.path.isdir(arg):
+        if recursive:
+            for path, dirs, filenames in os.walk(arg):
+                paths += markdown_files(path)
+        else:
             paths += markdown_files(arg)
     return paths
 
@@ -72,6 +76,17 @@ def create_assets():
         raise Exception("The path ./assets exists and is a file.")
     shutil.copytree(asset_path, destination)
 
+def find_customizations(path):
+    header_path = os.path.join(path, "header.html")
+    footer_path = os.path.join(path, "footer.html")
+    header, footer = "", ""
+    if os.path.isfile(footer_path):
+        with open(footer_path) as f:
+            footer = f.read()
+    if os.path.isfile(header_path):
+        with open(header_path) as f:
+            header = f.read()
+    return header, footer
 
 def find_custom_template(args):
     """Finds a custom template in the directories provided as arguments.  The
@@ -141,15 +156,21 @@ def main():
     else:
         context['embed'] = None
 
-    paths = args_to_paths(args)
-    for path in paths:
-        output = path.rsplit('.', 1)[0] + '.html'
-        with open(path) as f:
-            document = gfm.gfmd(f.read(), fenced="pygments" if not opts.prettify else "bootstrap")
-        context['title'] = extract_title(document)
-        context['document'] = document
-        template = get_jinja_template(opts, args)
-        with open(output, "w") as f:
-            f.write(template.render(context).encode("utf-8"))
-            print "Created %s from %s" % (output, path)
+    for arg in args:
+        header, footer = "", ""
+        paths = arg_to_paths(arg, opts.recursive)
+        if os.path.isdir(arg):
+            header, footer = find_customizations(arg)
+        for path in paths:
+            output = path.rsplit('.', 1)[0] + '.html'
+            with open(path) as f:
+                document = gfm.gfmd(f.read(), fenced="pygments" if not opts.prettify else "bootstrap")
+            context['title'] = extract_title(document)
+            context['document'] = document
+            context['header'] = header
+            context['footer'] = footer
+            template = get_jinja_template(opts, args)
+            with open(output, "w") as f:
+                f.write(template.render(context).encode("utf-8"))
+                print "Created %s from %s" % (output, path)
 

@@ -60,18 +60,18 @@
   </head>
   {% block outerbody %}
   <body {% if prettify %}onload="prettyPrint();"{% endif %}>
-  {{ header }}
   <div class="container">
+  {{ header|safe }}
   {% block body %}
 {{ document }}
   {% endblock %}
+  {{ footer|safe }}
   </div>
 
   {% if (embed['js'] or js) and not prettify %}
   {# add linenumbers to pygmentized source when javascript is available #}
   <script>$("div.linenodiv pre").each(function() { $(this).html($(this).html().replace(/\n/g, '.\n') + '.'); });</script>
   {% endif %}
-  {{ footer }}
   </body>
   {% endblock %}
 </html>
