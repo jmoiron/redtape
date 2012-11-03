@@ -164,7 +164,7 @@ def main():
         for path in paths:
             output = path.rsplit('.', 1)[0] + '.html'
             with open(path) as f:
-                document = gfm.gfmd(f.read(), fenced="pygments" if not opts.prettify else "bootstrap")
+                document = gfm.gfmd(f.read().decode("utf-8"), fenced="pygments" if not opts.prettify else "bootstrap")
             context['title'] = extract_title(document)
             context['document'] = document
             context['header'] = header
