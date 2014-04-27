@@ -116,5 +116,5 @@ it in the document directory as ``custom.html`` or ``custom.jinja``.
 sample output
 -------------
 
-.. image:: http://jmoiron.net/~jmoiron/i/sldriiq.png
+.. image:: http://jmoiron.net/i/sldriiq.png
 
