@@ -116,5 +116,5 @@ it in the document directory as ``custom.html`` or ``custom.jinja``.
 sample output
 -------------
 
-.. image:: http://jmoiron.net/i/sldriiq.png
+The [sqlx documentation](https://jmoiron.github.io/sqlx) and [mandira documentation](https://jmoiron.github.io/mandira) are both generated with redtape.
 
